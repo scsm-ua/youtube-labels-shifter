@@ -16,7 +16,7 @@
 	<div id="error-label"></div>
 	<div>
 		<div>
-			Set shift time in <strong>mm:ss</strong> fortmat. Examples: <strong>4:20</strong> - 4 minutes, 20 seconds. <strong>14</strong> - 14 seconds:
+			Set backward shift time in <strong>mm:ss</strong> fortmat. Examples: <strong>4:20</strong> - 4 minutes, 20 seconds. <strong>14</strong> - 14 seconds. Use nagative value to shift forward.
 		</div>
 		<input id="delta" type="text" placeholder="mm:ss" value="00:00">
 	</div>
@@ -118,10 +118,10 @@
 
 			var deltaStr = delta.value;
 			var deltaSeconds;
-			if (deltaStr.indexOf(0) === '-') {
-				deltaSeconds = - parseSeconds(deltaStr.substring(1));
+			if (/^-/.test(deltaStr)) {
+				deltaSeconds = parseSeconds(deltaStr.substring(1));
 			} else {
-				deltaSeconds = parseSeconds(deltaStr);
+				deltaSeconds = - parseSeconds(deltaStr);
 			}
 
 			tout.value = convert(tin.value, deltaSeconds);
