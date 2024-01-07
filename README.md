@@ -9,7 +9,7 @@ Example input:
 ```
 Shift: 2:12
 
-00:00 Label 1
+02:12 Label 1
 04:24 Label 2
 09:04 Label 3
 ```
@@ -17,7 +17,7 @@ Shift: 2:12
 Example output: 
 
 ```
-02:12 Label 1
-06:36 Label 2
-11:16 Label 3
+00:00 Label 1
+02:12 Label 2
+06:52 Label 3
 ```
