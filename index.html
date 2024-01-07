@@ -91,7 +91,7 @@
 		}
 
 		function convert(input, deltaSeconds) {
-			var rows = input.split(/[\r\n]/).map(function(r) { return r.trim() }).filter(Boolean);
+			var rows = input.split(/[\r\n]/).map(function(r) { return r.trim() });
 			var rows_parsed = rows.map(function(r) {
 				var match = r.match(/^((?:(?:\d+):)?(?:\d+):(?:\d+))\s+(.+)$/);
 				if (match) {
