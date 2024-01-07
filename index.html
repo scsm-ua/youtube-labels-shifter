@@ -102,7 +102,7 @@
 					var seconds = formatTime(result);
 					return `${seconds} ${match[2]}`;
 				} else {
-					showError('Unrecognized row format (expected "mm:ss title"): ' + r)
+					return r;
 				}
 			});
 
