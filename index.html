@@ -1,0 +1,133 @@
+<head>
+	<style>
+		textarea {
+			width: 100%;
+		}
+		#error-label {
+			color: red;
+			display: none;
+			font-weight: bold;
+			margin-bottom: 10px;
+		}
+	</style>
+</head>
+<body>
+	<h4>Youtube labels shifter</h4>
+	<div id="error-label"></div>
+	<div>
+		<div>
+			Set shift time in <strong>mm:ss</strong> fortmat. Examples: <strong>4:20</strong> - 4 minutes, 20 seconds. <strong>14</strong> - 14 seconds:
+		</div>
+		<input id="delta" type="text" placeholder="mm:ss" value="00:00">
+	</div>
+
+	<div>
+		<div>
+			<br>
+			Paste Youtube labels here:
+		</div>
+		<textarea rows="10" id="in"></textarea>
+	</div>
+
+	<div>
+		<div>
+			<br>
+			Shifted Youtube labels:
+		</div>
+		<textarea rows="20" id="out"></textarea>
+	</div>
+	<div>
+		<br>
+		github: <a href="https://github.com/scsm-ua/youtube-labels-shifter">https://github.com/scsm-ua/youtube-labels-shifter</a>
+	</div>
+	<script>
+
+		function showError(text) {
+			var el = document.getElementById('error-label');
+			el.style.display = 'block';
+			el.innerText = text;
+			throw new Error(text);
+		}
+
+		function hideError() {
+			var el = document.getElementById('error-label');
+			el.style.display = 'none';
+		}
+
+		function parseSeconds(str) {
+			var bits = str.split(':');
+
+			if (bits.length > 3) {
+				showError('Too long time format (should be max hh:mm:ss): ' + str);
+			}
+			var numbers = bits.map(function(bit) {
+				var num = parseInt(bit);
+				if (isNaN(num)) {
+					showError('Non number value: ' + bit + ', in ' + str);
+				}
+				return num;
+			});
+			var i = numbers.length - 1;
+			var seconds = 0;
+			var multiplier = 1;
+			while (i>=0) {
+				var num = numbers[i];
+				seconds += numbers[i] * multiplier;
+				multiplier *= 60;
+				i--;
+			}
+			return seconds;
+		}
+
+		function formatTime(seconds) {
+			var hours = Math.floor(seconds / 3600);
+			var seconds_wo_hours = seconds - hours * 3600;
+			var minutes = Math.floor(seconds_wo_hours / 60);
+			var seconds = seconds % 60;
+
+			var time = (hours ? hours + ':' : '') + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+
+			return time;
+		}
+
+		function convert(input, deltaSeconds) {
+			var rows = input.split(/[\r\n]/).map(function(r) { return r.trim() }).filter(Boolean);
+			var rows_parsed = rows.map(function(r) {
+				var match = r.match(/^((?:(?:\d+):)?(?:\d+):(?:\d+))\s+(.+)$/);
+				if (match) {
+					var result = parseSeconds(match[1]) + deltaSeconds
+					if (result < 0) {
+						showError("Time " + match[1] + " with shift results negative number");
+					}
+					var seconds = formatTime(result);
+					return `${seconds} ${match[2]}`;
+				} else {
+					showError('Unrecognized row format (expected "mm:ss title"): ' + r)
+				}
+			});
+
+			return rows_parsed.join('\n');
+		}
+
+		var tin = document.getElementById("in");
+		var tout = document.getElementById("out")
+		var delta = document.getElementById("delta")
+
+		function process() {
+			hideError();
+
+			var deltaStr = delta.value;
+			var deltaSeconds;
+			if (deltaStr.indexOf(0) === '-') {
+				deltaSeconds = - parseSeconds(deltaStr.substring(1));
+			} else {
+				deltaSeconds = parseSeconds(deltaStr);
+			}
+
+			tout.value = convert(tin.value, deltaSeconds);
+		}
+		
+		tin.addEventListener('keyup', process);
+		delta.addEventListener('keyup', process);
+	</script>
+</body>
