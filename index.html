@@ -36,6 +36,15 @@
 		</div>
 		<textarea rows="20" id="out"></textarea>
 	</div>
+
+	<div>
+		<div>
+			<br>
+			Converted Youbute labels (with custom formatting):
+		</div>
+		<textarea rows="20" id="out2"></textarea>
+	</div>
+
 	<div>
 		<br>
 		github: <a href="https://github.com/scsm-ua/youtube-labels-shifter">https://github.com/scsm-ua/youtube-labels-shifter</a>
@@ -90,7 +99,7 @@
 			return time;
 		}
 
-		function convert(input, deltaSeconds) {
+		function convert(input, deltaSeconds, template) {
 			var rows = input.split(/[\r\n]/).map(function(r) { return r.trim() });
 			var rows_parsed = rows.map(function(r) {
 				var match = r.match(/^((?:(?:\d+):)?(?:\d+):(?:\d+))\s+(.+)$/);
@@ -100,7 +109,7 @@
 						showError("Time " + match[1] + " with shift results negative number");
 					}
 					var seconds = formatTime(result);
-					return `${seconds} ${match[2]}`;
+					return template.replace(/%time%/gi, seconds).replace(/%title%/gi, match[2]);
 				} else {
 					return r;
 				}
@@ -110,8 +119,9 @@
 		}
 
 		var tin = document.getElementById("in");
-		var tout = document.getElementById("out")
-		var delta = document.getElementById("delta")
+		var tout = document.getElementById("out");
+		var tout2 = document.getElementById("out2");
+		var delta = document.getElementById("delta");
 
 		function process() {
 			hideError();
@@ -124,7 +134,8 @@
 				deltaSeconds = - parseSeconds(deltaStr);
 			}
 
-			tout.value = convert(tin.value, deltaSeconds);
+			tout.value = convert(tin.value, deltaSeconds, "%time% %title%");
+			tout2.value = convert(tin.value, deltaSeconds, "<li><a>(%time%) %title%</a></li>");
 		}
 		
 		tin.addEventListener('keyup', process);
