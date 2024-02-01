@@ -101,6 +101,7 @@
 
 		function convert(input, deltaSeconds, template) {
 			var rows = input.split(/[\r\n]/).map(function(r) { return r.trim() });
+			var last_time;
 			var rows_parsed = rows.map(function(r) {
 				var match = r.match(/^((?:(?:\d+):)?(?:\d+):(?:\d+))\s+(.+)$/);
 				if (match) {
@@ -108,6 +109,10 @@
 					if (result < 0) {
 						showError("Time " + match[1] + " with shift results negative number");
 					}
+					if (last_time && result < last_time) {
+						showError("Time in '" + r + "'' is less then previous");
+					}
+					last_time = result;
 					var seconds = formatTime(result);
 					return template.replace(/%time%/gi, seconds).replace(/%title%/gi, match[2]);
 				} else {
